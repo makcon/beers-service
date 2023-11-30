@@ -1,0 +1,13 @@
+application:
+  title: Beer Tap
+  version: 1.0.0
+
+spring:
+  profiles:
+    active: ${ENV:local}
+  datasource:
+    url: ${POSTGRES_URL:jdbc:postgresql://rv-postgres-db:5432/postgres_rv_database}
+    username: ${POSTGRES_USERNAME:rv_user}
+    password: ${POSTGRES_PASSWORD:rv_password}
+    driverClassName: org.postgresql.Driver
+    initialization-mode: always

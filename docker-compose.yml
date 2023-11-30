@@ -1,35 +1,37 @@
 version: '3.9'
 
 services:
-    java-skeleton-api:
-        container_name: java-skeleton-api
-        image: gradle:latest # this is due to some Mac M1 issues with Docker :_
+    beer-tap-api:
+        container_name: beer-tap-api
+        image: maven:3.8.5-openjdk-17
         depends_on:
-            -   postgres-skeleton-db
+            - rv-postgres-db
         volumes:
-            -   "${PWD}:/home/gradle/project"
-            -   "rv-gradle-cache:/home/gradle/.gradle"
-        working_dir: "/home/gradle/project"
+            - "${PWD}:/home/maven/project"
+            - "rv-maven-cache:/root/.m2"
+        working_dir: "/home/maven/project"
         ports:
-            -   "8080:8080"
+            - "8080:8080"
         networks:
             internal-net:
 
-    postgres-skeleton-db:
-        container_name: postgres-skeleton-db
+    rv-postgres-db:
+        container_name: rv-postgres-db
         image: postgres:13.4-alpine
         restart: on-failure
         volumes:
             - rv-volume:/var/lib/postgresql/data
         env_file:
             - postgres.dev.env
+        ports:
+            - "15432:5432"
         networks:
             internal-net:
 
 volumes:
     rv-volume:
-    rv-gradle-cache:
+    rv-maven-cache:
 
 networks:
     internal-net:
-        name: rv-skeleton-net
+        name: rv-net
