@@ -6,6 +6,8 @@ import com.rviewer.beers.app.mother.DispenserMother
 import com.rviewer.beers.domain.model.Dispenser
 import com.rviewer.beers.domain.model.DispenserStatus
 import com.rviewer.beers.domain.port.DispenserRepositoryPort
+import com.rviewer.beers.domain.port.UsageRepositoryPort
+import org.junit.jupiter.api.AfterEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -27,6 +29,14 @@ abstract class ATAbstractTest {
     
     @Autowired
     lateinit var usageRepository: UsageRepository
+    
+    @Autowired
+    lateinit var usageRepositoryPort: UsageRepositoryPort
+    
+    @AfterEach
+    internal fun tearDown() {
+        usageRepository.deleteAll()
+    }
     
     fun createDispenser(status: DispenserStatus): Dispenser {
         val dispenser = DispenserMother.of(status = status)

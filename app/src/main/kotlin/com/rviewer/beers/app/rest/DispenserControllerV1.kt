@@ -2,13 +2,17 @@ package com.rviewer.beers.app.rest
 
 import com.rviewer.beers.app.dto.CreateDispenserRequestParamsV1
 import com.rviewer.beers.app.dto.DispenserV1
+import com.rviewer.beers.app.dto.GetSpendingRequestParamsV1
+import com.rviewer.beers.app.dto.GetSpendingResponseV1
 import com.rviewer.beers.app.mapper.toCommand
 import com.rviewer.beers.app.mapper.toDto
+import com.rviewer.beers.app.mapper.toQuery
 import com.rviewer.beers.domain.command.CloseDispenserCommand
 import com.rviewer.beers.domain.command.OpenDispenserCommand
 import com.rviewer.beers.domain.command.handler.CloseDispenserCommandHandler
 import com.rviewer.beers.domain.command.handler.CreateDispenserCommandHandler
 import com.rviewer.beers.domain.command.handler.OpenDispenserCommandHandler
+import com.rviewer.beers.domain.query.handler.GetSpendingQueryHandler
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -19,6 +23,7 @@ class DispenserControllerV1(
     private val createHandler: CreateDispenserCommandHandler,
     private val openHandler: OpenDispenserCommandHandler,
     private val closeHandler: CloseDispenserCommandHandler,
+    private val getSpendingHandler: GetSpendingQueryHandler,
 ) {
     
     @PostMapping
@@ -33,4 +38,8 @@ class DispenserControllerV1(
     @PutMapping("/{id}/close")
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun close(@PathVariable id: UUID) = closeHandler.handle(CloseDispenserCommand(id))
+    
+    @GetMapping("{id}/spending")
+    fun getSpending(@PathVariable id: UUID, params: GetSpendingRequestParamsV1): GetSpendingResponseV1 =
+        getSpendingHandler.handle(params.toQuery(id)).toDto()
 }

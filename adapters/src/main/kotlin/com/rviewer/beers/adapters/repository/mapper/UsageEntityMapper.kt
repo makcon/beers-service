@@ -1,7 +1,9 @@
 package com.rviewer.beers.adapters.repository.mapper
 
 import com.rviewer.beers.adapters.repository.entity.UsageEntity
+import com.rviewer.beers.domain.model.PageResult
 import com.rviewer.beers.domain.model.Usage
+import org.springframework.data.domain.Page
 import java.util.*
 
 fun Usage.toEntity() = UsageEntity(
@@ -20,4 +22,9 @@ fun UsageEntity.toModel() = Usage(
     closedAt = closedAt,
     flowVolume = flowVolume,
     totalSpent = totalSpent,
+)
+
+fun Page<UsageEntity>.toModel() = PageResult(
+    totalCount = totalElements,
+    items = content.map { it.toModel() },
 )

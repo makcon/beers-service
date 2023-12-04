@@ -5,7 +5,6 @@ import com.rviewer.beers.app.dto.ErrorV1
 import com.rviewer.beers.domain.model.DispenserStatus.CLOSED
 import com.rviewer.beers.domain.model.DispenserStatus.OPENED
 import io.kotest.matchers.shouldBe
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
@@ -13,11 +12,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import java.util.*
 
 internal class ATOpenDispenserProcessShould : ATAbstractTest() {
-    
-    @AfterEach
-    internal fun tearDown() {
-        usageRepository.deleteAll()
-    }
     
     @Test
     fun `successfully open a dispenser`() {
