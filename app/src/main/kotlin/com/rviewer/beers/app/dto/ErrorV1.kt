@@ -10,4 +10,5 @@ object ErrorCode {
     
     const val NOT_FOUND = "NotFound"
     const val ALREADY_OPENED = "AlreadyOpened"
+    const val ALREADY_CLOSED = "AlreadyClosed"
 }

@@ -1,5 +1,6 @@
-package com.rviewer.beers.domain.command.mother
+package com.rviewer.beers.domain.mother
 
+import com.rviewer.beers.domain.command.CloseDispenserCommand
 import com.rviewer.beers.domain.command.CreateDispenserCommand
 import com.rviewer.beers.domain.command.OpenDispenserCommand
 import java.util.*
@@ -15,6 +16,13 @@ object CreateDispenserCommandMother {
 object OpenDispenserCommandMother {
     
     fun of(dispenserId: UUID = UUID.randomUUID()) = OpenDispenserCommand(
+        dispenserId = dispenserId,
+    )
+}
+
+object CloseDispenserCommandMother {
+    
+    fun of(dispenserId: UUID = UUID.randomUUID()) = CloseDispenserCommand(
         dispenserId = dispenserId,
     )
 }

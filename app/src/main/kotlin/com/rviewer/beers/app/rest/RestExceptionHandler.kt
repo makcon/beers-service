@@ -3,6 +3,7 @@ package com.rviewer.beers.app.rest
 import com.rviewer.beers.app.dto.ErrorCode
 import com.rviewer.beers.app.dto.ErrorV1
 import com.rviewer.beers.domain.exception.DispenserInUseException
+import com.rviewer.beers.domain.exception.DispenserNotOpenedException
 import com.rviewer.beers.domain.exception.ModelNotFoundException
 import mu.KotlinLogging
 import org.springframework.http.HttpStatus
@@ -26,6 +27,13 @@ class RestExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     fun handle(exception: DispenserInUseException): ErrorV1 = createError(
         code = ErrorCode.ALREADY_OPENED,
+        exception = exception
+    )
+    
+    @ExceptionHandler(DispenserNotOpenedException::class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    fun handle(exception: DispenserNotOpenedException): ErrorV1 = createError(
+        code = ErrorCode.ALREADY_CLOSED,
         exception = exception
     )
     

@@ -1,12 +1,12 @@
 package com.rviewer.beers.domain.command.handler
 
 import com.rviewer.beers.domain.command.OpenDispenserCommand
-import com.rviewer.beers.domain.command.mother.DispenserMother
-import com.rviewer.beers.domain.command.mother.OpenDispenserCommandMother
 import com.rviewer.beers.domain.exception.DispenserInUseException
 import com.rviewer.beers.domain.model.Dispenser
 import com.rviewer.beers.domain.model.DispenserStatus
 import com.rviewer.beers.domain.model.Usage
+import com.rviewer.beers.domain.mother.DispenserMother
+import com.rviewer.beers.domain.mother.OpenDispenserCommandMother
 import com.rviewer.beers.domain.port.DispenserRepositoryPort
 import com.rviewer.beers.domain.port.UsageRepositoryPort
 import com.rviewer.beers.domain.utils.IdGenerator

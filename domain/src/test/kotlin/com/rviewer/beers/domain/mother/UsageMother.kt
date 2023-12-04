@@ -1,6 +1,5 @@
-package com.rviewer.beers.adapters.mother
+package com.rviewer.beers.domain.mother
 
-import com.rviewer.beers.adapters.repository.entity.UsageEntity
 import com.rviewer.beers.domain.model.Usage
 import java.math.BigDecimal
 import java.time.Instant
@@ -17,25 +16,6 @@ object UsageMother {
         flowVolume: Float = Random.nextFloat(),
         totalSpent: BigDecimal? = Random.nextDouble().toBigDecimal(),
     ) = Usage(
-        id = id,
-        dispenserId = dispenserId,
-        openedAt = openedAt,
-        closedAt = closedAt,
-        flowVolume = flowVolume,
-        totalSpent = totalSpent,
-    )
-}
-
-object UsageEntityMother {
-    
-    fun of(
-        id: String = UUID.randomUUID().toString(),
-        dispenserId: String = UUID.randomUUID().toString(),
-        openedAt: Instant = Instant.now(),
-        closedAt: Instant? = Instant.now(),
-        flowVolume: Float = Random.nextFloat(),
-        totalSpent: BigDecimal? = Random.nextDouble().toBigDecimal(),
-    ) = UsageEntity(
         id = id,
         dispenserId = dispenserId,
         openedAt = openedAt,

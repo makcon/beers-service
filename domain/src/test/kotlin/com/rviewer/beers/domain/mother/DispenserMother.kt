@@ -1,4 +1,4 @@
-package com.rviewer.beers.domain.command.mother
+package com.rviewer.beers.domain.mother
 
 import com.rviewer.beers.domain.model.Dispenser
 import com.rviewer.beers.domain.model.DispenserStatus
