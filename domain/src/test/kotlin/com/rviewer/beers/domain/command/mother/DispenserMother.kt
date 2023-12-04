@@ -1,4 +1,4 @@
-package com.rviewer.beers.adapters.mother
+package com.rviewer.beers.domain.command.mother
 
 import com.rviewer.beers.domain.model.Dispenser
 import com.rviewer.beers.domain.model.DispenserStatus
@@ -14,6 +14,6 @@ object DispenserMother {
     ) = Dispenser(
         id = id,
         flowVolume = flowVolume,
-        status = status
+        status = status,
     )
 }

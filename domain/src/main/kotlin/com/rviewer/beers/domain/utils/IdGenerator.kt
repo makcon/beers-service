@@ -7,4 +7,6 @@ import java.util.*
 class IdGenerator {
     
     fun dispenser(): UUID = UUID.randomUUID()
+    
+    fun usage(): UUID = UUID.randomUUID()
 }
