@@ -8,8 +8,8 @@ import com.rviewer.beers.domain.model.Usage
 import com.rviewer.beers.domain.mother.CloseDispenserCommandMother
 import com.rviewer.beers.domain.mother.DispenserMother
 import com.rviewer.beers.domain.mother.UsageMother
-import com.rviewer.beers.domain.port.DispenserRepositoryPort
 import com.rviewer.beers.domain.port.UsageRepositoryPort
+import com.rviewer.beers.domain.validator.DispenserValidator
 import com.rviewer.beers.domain.validator.UsageValidator
 import io.kotest.matchers.shouldBe
 import io.mockk.*
@@ -18,7 +18,6 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit5.MockKExtension
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
@@ -31,7 +30,7 @@ internal class CloseDispenserCommandHandlerShould {
     lateinit var handler: CloseDispenserCommandHandler
     
     @RelaxedMockK
-    lateinit var dispenserRepository: DispenserRepositoryPort
+    lateinit var dispenserValidator: DispenserValidator
     
     @RelaxedMockK
     lateinit var usageRepository: UsageRepositoryPort
@@ -46,17 +45,12 @@ internal class CloseDispenserCommandHandlerShould {
     private val usageSlot = slot<Usage>()
     private var givenCommand = CloseDispenserCommandMother.of(dispenserId = storedDispenser.id)
     
-    @BeforeEach
-    internal fun setUp() {
-        every { dispenserRepository.findByIdRequired(any()) } returns storedDispenser
-    }
-    
     @AfterEach
     internal fun tearDown() {
-        verify(exactly = 1) { dispenserRepository.findByIdRequired(givenCommand.dispenserId) }
+        verify(exactly = 1) { dispenserValidator.validateIfExists(givenCommand.dispenserId) }
     
         confirmVerified(
-            dispenserRepository,
+            dispenserValidator,
             usageRepository,
             spendingCalculator,
             usageValidator,
@@ -64,15 +58,14 @@ internal class CloseDispenserCommandHandlerShould {
     }
     
     @Test
-    fun `does nothing when dispenser not found`() {
+    fun `throw validation exception when dispenser validator throws`() {
         // given
-        givenCommand = CloseDispenserCommandMother.of()
         val expectedException = mockk<DispenserInUseException>()
-        every { dispenserRepository.findByIdRequired(any()) } throws expectedException
-    
+        every { dispenserValidator.validateIfExists(any()) } throws expectedException
+        
         // when
         val exception = assertThrows<DispenserInUseException> { handler.handle(givenCommand) }
-    
+        
         // then
         exception shouldBe expectedException
     }

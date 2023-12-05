@@ -21,4 +21,6 @@ class DispenserRepositoryAdapter(
         .findById(id.toString())
         .map { it.toModel() }
         .orElse(null)
+    
+    override fun existsById(id: UUID): Boolean = repository.existsById(id.toString())
 }

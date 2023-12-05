@@ -1,5 +1,6 @@
 package com.rviewer.beers.app.acceptance
 
+import com.rviewer.beers.app.dto.ErrorCode
 import com.rviewer.beers.app.dto.GetSpendingResponseV1
 import com.rviewer.beers.app.mapper.toDto
 import io.kotest.matchers.shouldBe
@@ -59,7 +60,7 @@ internal class ATGetUsagesProcessShould : ATAbstractDispenserTest() {
         
         // when
         val actions = mvc.perform(get("/v1/dispensers/${storedDispenser.id}/spending"))
-        
+    
         // then
         val response = verifyAndGetObject(actions, HttpStatus.OK, GetSpendingResponseV1::class.java)
         response shouldBe GetSpendingResponseV1(
@@ -67,6 +68,19 @@ internal class ATGetUsagesProcessShould : ATAbstractDispenserTest() {
             totalAmount = storedUsage.totalSpent!!,
             usages = listOf(storedUsage)
         )
+    }
+    
+    @Test
+    fun `return not found status when dispenser not found`() {
+        // given
+        val givenDispenserId = UUID.randomUUID()
+        
+        // when
+        val actions = mvc.perform(buildGetRequest(givenDispenserId))
+        
+        // then
+        val error = verifyAndGetError(actions, HttpStatus.NOT_FOUND)
+        error.code shouldBe ErrorCode.NOT_FOUND
     }
     
     private fun buildGetRequest(

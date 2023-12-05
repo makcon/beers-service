@@ -16,6 +16,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import java.util.*
 
 @ExtendWith(MockKExtension::class)
@@ -26,6 +28,8 @@ internal class DispenserRepositoryAdapterShould {
     
     @MockK
     lateinit var repository: DispenserRepository
+    
+    private val givenId = UUID.randomUUID()
     
     @BeforeEach
     internal fun setUp() {
@@ -52,7 +56,6 @@ internal class DispenserRepositoryAdapterShould {
     @Test
     fun `find entity by id and map to model`() {
         // given
-        val givenId = UUID.randomUUID()
         val storedEntity = DispenserEntityMother.of()
         every { repository.findById(any()) } returns Optional.of(storedEntity)
         
@@ -67,7 +70,6 @@ internal class DispenserRepositoryAdapterShould {
     @Test
     fun `return null when entity not found`() {
         // given
-        val givenId = UUID.randomUUID()
         every { repository.findById(any()) } returns Optional.empty()
         
         // when
@@ -81,13 +83,26 @@ internal class DispenserRepositoryAdapterShould {
     @Test
     fun `throw exception when required entity not found`() {
         // given
-        val givenId = UUID.randomUUID()
         every { repository.findById(any()) } returns Optional.empty()
-        
+    
         // when
         assertThrows<ModelNotFoundException> { adapter.findByIdRequired(givenId) }
-        
+    
         // then
         verify { repository.findById(givenId.toString()) }
+    }
+    
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `call repository to check if exists`(expectedResponse: Boolean) {
+        // given
+        every { repository.existsById(any()) } returns expectedResponse
+        
+        // when
+        val exists = adapter.existsById(givenId)
+        
+        // then
+        exists shouldBe expectedResponse
+        verify(exactly = 1) { repository.existsById(givenId.toString()) }
     }
 }

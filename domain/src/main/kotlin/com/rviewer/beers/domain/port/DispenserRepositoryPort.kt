@@ -12,4 +12,6 @@ interface DispenserRepositoryPort {
     
     fun findByIdRequired(id: UUID): Dispenser = findById(id)
         ?: throw ModelNotFoundException("Dispenser not found by id: $id")
+    
+    fun existsById(id: UUID): Boolean
 }

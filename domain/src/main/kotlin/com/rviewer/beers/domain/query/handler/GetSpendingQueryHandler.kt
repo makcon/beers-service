@@ -5,6 +5,7 @@ import com.rviewer.beers.domain.model.GetSpendingResult
 import com.rviewer.beers.domain.model.Usage
 import com.rviewer.beers.domain.port.UsageRepositoryPort
 import com.rviewer.beers.domain.query.GetSpendingQuery
+import com.rviewer.beers.domain.validator.DispenserValidator
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
 import java.time.Clock
@@ -14,16 +15,18 @@ class GetSpendingQueryHandler(
     private val usageRepository: UsageRepositoryPort,
     private val spendingCalculator: SpendingCalculator,
     private val clock: Clock,
+    private val dispenserValidator: DispenserValidator,
 ) {
     
     fun handle(query: GetSpendingQuery): GetSpendingResult {
+        dispenserValidator.validateIfExists(query.dispenserId)
+    
         val page = usageRepository.findLatestByDispenserId(query.dispenserId, query.page)
-        
         if (page.items.isEmpty()) return GetSpendingResult()
-        
+    
         val totalAmounts = mutableListOf(usageRepository.getTotalAmountByDispenserId(query.dispenserId))
         val usages = page.items.map { calculateOpened(it, totalAmounts) }
-        
+    
         return GetSpendingResult(
             totalCount = page.totalCount,
             totalAmount = totalAmounts.sumOf { it },
