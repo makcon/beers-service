@@ -8,8 +8,6 @@ interface DispenserRepositoryPort {
     
     fun create(dispenser: Dispenser)
     
-    fun update(dispenser: Dispenser)
-    
     fun findById(id: UUID): Dispenser?
     
     fun findByIdRequired(id: UUID): Dispenser = findById(id)

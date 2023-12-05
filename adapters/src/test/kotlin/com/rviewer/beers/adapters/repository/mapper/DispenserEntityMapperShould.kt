@@ -22,7 +22,6 @@ internal class DispenserEntityMapperShould {
         entity shouldBe DispenserEntity(
             id = givenModel.id.toString(),
             flowVolume = givenModel.flowVolume,
-            status = givenModel.status,
         )
     }
     
@@ -38,7 +37,6 @@ internal class DispenserEntityMapperShould {
         entity shouldBe Dispenser(
             id = UUID.fromString(givenModel.id),
             flowVolume = givenModel.flowVolume,
-            status = givenModel.status,
         )
     }
 }

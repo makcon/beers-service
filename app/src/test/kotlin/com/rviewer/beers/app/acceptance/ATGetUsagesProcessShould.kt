@@ -2,9 +2,6 @@ package com.rviewer.beers.app.acceptance
 
 import com.rviewer.beers.app.dto.GetSpendingResponseV1
 import com.rviewer.beers.app.mapper.toDto
-import com.rviewer.beers.app.mother.UsageMother
-import com.rviewer.beers.domain.model.DispenserStatus.CLOSED
-import com.rviewer.beers.domain.model.Usage
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.springframework.test.web.servlet.ResultActions
@@ -13,12 +10,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import java.util.*
 
-internal class ATGetUsagesProcessShould : ATAbstractTest() {
+internal class ATGetUsagesProcessShould : ATAbstractDispenserTest() {
     
     @Test
     fun `returned sorted usages response`() {
         // given
-        val storedDispenser = createDispenser(status = CLOSED)
+        val storedDispenser = createDispenser()
         val storedUsage = createUsage(storedDispenser.id).toDto()
         val storedUsage2 = createUsage(storedDispenser.id).toDto()
         createUsage(UUID.randomUUID())
@@ -38,7 +35,7 @@ internal class ATGetUsagesProcessShould : ATAbstractTest() {
     @Test
     fun `return first page of sorted usages`() {
         // given
-        val storedDispenser = createDispenser(status = CLOSED)
+        val storedDispenser = createDispenser()
         val storedUsage = createUsage(storedDispenser.id).toDto()
         val storedUsage2 = createUsage(storedDispenser.id).toDto()
         val storedUsage3 = createUsage(storedDispenser.id).toDto()
@@ -58,7 +55,7 @@ internal class ATGetUsagesProcessShould : ATAbstractTest() {
     @Test
     fun `returned result when page info not provided`() {
         // given
-        val storedDispenser = createDispenser(status = CLOSED)
+        val storedDispenser = createDispenser()
         val storedUsage = createUsage(storedDispenser.id).toDto()
         
         // when
@@ -81,13 +78,6 @@ internal class ATGetUsagesProcessShould : ATAbstractTest() {
             .contentAsString
         
         return objectMapper.readValue(content, GetSpendingResponseV1::class.java)
-    }
-    
-    private fun createUsage(dispenserId: UUID): Usage {
-        val usage = UsageMother.of(dispenserId = dispenserId)
-        usageRepositoryPort.create(usage)
-        
-        return usage
     }
     
     private fun buildGetRequest(

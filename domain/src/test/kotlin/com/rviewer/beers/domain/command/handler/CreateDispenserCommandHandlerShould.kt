@@ -1,7 +1,6 @@
 package com.rviewer.beers.domain.command.handler
 
 import com.rviewer.beers.domain.model.Dispenser
-import com.rviewer.beers.domain.model.DispenserStatus
 import com.rviewer.beers.domain.mother.CreateDispenserCommandMother
 import com.rviewer.beers.domain.port.DispenserRepositoryPort
 import com.rviewer.beers.domain.utils.IdGenerator
@@ -47,7 +46,6 @@ internal class CreateDispenserCommandHandlerShould {
         val expectedDispenser = Dispenser(
             id = generatedDispenserId,
             flowVolume = givenCommand.flowVolume,
-            status = DispenserStatus.CLOSED,
         )
         
         // when

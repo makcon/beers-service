@@ -17,10 +17,6 @@ class DispenserRepositoryAdapter(
         repository.save(dispenser.toEntity())
     }
     
-    override fun update(dispenser: Dispenser) {
-        repository.save(dispenser.toEntity())
-    }
-    
     override fun findById(id: UUID): Dispenser? = repository
         .findById(id.toString())
         .map { it.toModel() }

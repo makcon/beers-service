@@ -2,8 +2,6 @@ package com.rviewer.beers.app.acceptance
 
 import com.rviewer.beers.app.dto.ErrorCode
 import com.rviewer.beers.app.dto.ErrorV1
-import com.rviewer.beers.domain.model.DispenserStatus.CLOSED
-import com.rviewer.beers.domain.model.DispenserStatus.OPENED
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
@@ -11,12 +9,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import java.util.*
 
-internal class ATOpenDispenserProcessShould : ATAbstractTest() {
+internal class ATOpenDispenserProcessShould : ATAbstractDispenserTest() {
     
     @Test
     fun `successfully open a dispenser`() {
         // given
-        val storedDispenser = createDispenser(status = CLOSED)
+        val storedDispenser = createDispenser()
         
         // when
         val actions = mvc.perform(buildOpenRequest(storedDispenser.id))
@@ -47,11 +45,12 @@ internal class ATOpenDispenserProcessShould : ATAbstractTest() {
     @Test
     fun `return conflict status when dispenser is already opened`() {
         // given
-        val storedDispenser = createDispenser(status = OPENED)
-        
+        val storedDispenser = createDispenser()
+        createUsage(dispenserId = storedDispenser.id, closedAt = null)
+    
         // when
         val actions = mvc.perform(buildOpenRequest(storedDispenser.id))
-        
+    
         // then
         val content = actions.andExpect(MockMvcResultMatchers.status().isConflict)
             .andReturn()
@@ -59,7 +58,7 @@ internal class ATOpenDispenserProcessShould : ATAbstractTest() {
             .contentAsString
         val error = objectMapper.readValue(content, ErrorV1::class.java)
         error.code shouldBe ErrorCode.ALREADY_OPENED
-        verifyUsagesCreated(0)
+        verifyUsagesCreated(1)
     }
     
     private fun buildOpenRequest(dispenserId: UUID): MockHttpServletRequestBuilder =

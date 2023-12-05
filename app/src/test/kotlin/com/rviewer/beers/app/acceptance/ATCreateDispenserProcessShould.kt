@@ -10,7 +10,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
-internal class ATCreateDispenserProcessShould : ATAbstractTest() {
+internal class ATCreateDispenserProcessShould : ATAbstractDispenserTest() {
     
     @Test
     fun `successfully create a dispenser`() {

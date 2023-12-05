@@ -17,7 +17,6 @@ fun CreateDispenserRequestParamsV1.toCommand() = CreateDispenserCommand(
 fun Dispenser.toDto() = DispenserV1(
     id = id,
     flowVolume = flowVolume,
-    status = status.name
 )
 
 fun GetSpendingRequestParamsV1.toQuery(dispenserId: UUID) = GetSpendingQuery(

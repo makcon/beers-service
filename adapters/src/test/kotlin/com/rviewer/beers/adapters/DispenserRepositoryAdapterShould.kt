@@ -50,18 +50,6 @@ internal class DispenserRepositoryAdapterShould {
     }
     
     @Test
-    fun `call repository to update dispenser`() {
-        // given
-        val givenDispenser = DispenserMother.of()
-        
-        // when
-        adapter.update(givenDispenser)
-        
-        // then
-        verify { repository.save(givenDispenser.toEntity()) }
-    }
-    
-    @Test
     fun `find entity by id and map to model`() {
         // given
         val givenId = UUID.randomUUID()

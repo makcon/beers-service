@@ -35,7 +35,6 @@ internal class DispenserV1MapperShould {
         dto shouldBe DispenserV1(
             id = givenModel.id,
             flowVolume = givenModel.flowVolume,
-            status = givenModel.status.name
         )
     }
 }
