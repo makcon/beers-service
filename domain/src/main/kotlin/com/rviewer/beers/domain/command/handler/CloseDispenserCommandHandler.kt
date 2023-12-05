@@ -6,26 +6,26 @@ import com.rviewer.beers.domain.exception.DispenserNotOpenedException
 import com.rviewer.beers.domain.model.Usage
 import com.rviewer.beers.domain.port.DispenserRepositoryPort
 import com.rviewer.beers.domain.port.UsageRepositoryPort
+import com.rviewer.beers.domain.validator.UsageValidator
 import org.springframework.stereotype.Component
-import java.time.Clock
 import java.time.Instant
 
 @Component
 class CloseDispenserCommandHandler(
     private val dispenserRepository: DispenserRepositoryPort,
     private val usageRepository: UsageRepositoryPort,
-    private val clock: Clock,
     private val spendingCalculator: SpendingCalculator,
+    private val usageValidator: UsageValidator,
 ) {
     
     fun handle(command: CloseDispenserCommand) {
-        val closedAt = clock.instant()
-    
         val dispenser = dispenserRepository.findByIdRequired(command.dispenserId)
         val usage = usageRepository.findOpened(dispenser.id)
             ?: throw DispenserNotOpenedException(dispenser.id)
     
-        updateUsage(usage, closedAt)
+        usageValidator.validateClosedAt(usage, command.closedAt)
+    
+        updateUsage(usage, command.closedAt)
     }
     
     private fun updateUsage(usage: Usage, closedAt: Instant) {

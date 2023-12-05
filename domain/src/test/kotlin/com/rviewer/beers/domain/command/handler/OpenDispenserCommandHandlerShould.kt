@@ -1,5 +1,6 @@
 package com.rviewer.beers.domain.command.handler
 
+import com.rviewer.beers.domain.command.OpenDispenserCommand
 import com.rviewer.beers.domain.exception.DispenserInUseException
 import com.rviewer.beers.domain.model.Dispenser
 import com.rviewer.beers.domain.model.Usage
@@ -15,11 +16,10 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit5.MockKExtension
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
-import java.time.Clock
-import java.time.Instant
 import java.util.*
 
 @ExtendWith(MockKExtension::class)
@@ -37,10 +37,13 @@ internal class OpenDispenserCommandHandlerShould {
     @MockK
     lateinit var idGenerator: IdGenerator
     
-    @MockK
-    lateinit var clock: Clock
-    
     private val usageSlot = slot<Usage>()
+    private val generatedUsageId = UUID.randomUUID()
+    
+    @BeforeEach
+    internal fun setUp() {
+        every { idGenerator.usage() } returns generatedUsageId
+    }
     
     @AfterEach
     internal fun tearDown() {
@@ -48,7 +51,6 @@ internal class OpenDispenserCommandHandlerShould {
             dispenserRepository,
             usageRepository,
             idGenerator,
-            clock,
         )
     }
     
@@ -89,12 +91,8 @@ internal class OpenDispenserCommandHandlerShould {
         val storedDispenser = DispenserMother.of(
             id = givenCommand.dispenserId,
         )
-        val generatedUsageId = UUID.randomUUID()
         every { dispenserRepository.findByIdRequired(any()) } returns storedDispenser
         every { usageRepository.findOpened(any()) } returns null
-        every { idGenerator.usage() } returns generatedUsageId
-        val expectedOpenedAt = Instant.now()
-        every { clock.instant() } returns expectedOpenedAt
         
         // when
         handler.handle(givenCommand)
@@ -103,20 +101,18 @@ internal class OpenDispenserCommandHandlerShould {
         verify(exactly = 1) { dispenserRepository.findByIdRequired(givenCommand.dispenserId) }
         verify(exactly = 1) { usageRepository.findOpened(givenCommand.dispenserId) }
         verify(exactly = 1) { idGenerator.usage() }
-        verify(exactly = 1) { clock.instant() }
-        verifyUsageCreated(generatedUsageId, expectedOpenedAt, storedDispenser)
+        verifyUsageCreated(givenCommand, storedDispenser)
     }
     
     private fun verifyUsageCreated(
-        generatedUsageId: UUID,
-        expectedOpenedAt: Instant,
+        command: OpenDispenserCommand,
         storedDispenser: Dispenser,
     ) {
         verify(exactly = 1) { usageRepository.create(capture(usageSlot)) }
         usageSlot.captured shouldBe Usage(
             id = generatedUsageId,
             dispenserId = storedDispenser.id,
-            openedAt = expectedOpenedAt,
+            openedAt = command.openedAt,
             closedAt = null,
             flowVolume = storedDispenser.flowVolume,
             totalSpent = null

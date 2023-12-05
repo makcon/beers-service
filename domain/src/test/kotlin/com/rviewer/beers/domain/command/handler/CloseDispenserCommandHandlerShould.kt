@@ -1,6 +1,7 @@
 package com.rviewer.beers.domain.command.handler
 
 import com.rviewer.beers.domain.calcualor.SpendingCalculator
+import com.rviewer.beers.domain.exception.ClosedAtInvalidException
 import com.rviewer.beers.domain.exception.DispenserInUseException
 import com.rviewer.beers.domain.exception.DispenserNotOpenedException
 import com.rviewer.beers.domain.model.Usage
@@ -9,6 +10,7 @@ import com.rviewer.beers.domain.mother.DispenserMother
 import com.rviewer.beers.domain.mother.UsageMother
 import com.rviewer.beers.domain.port.DispenserRepositoryPort
 import com.rviewer.beers.domain.port.UsageRepositoryPort
+import com.rviewer.beers.domain.validator.UsageValidator
 import io.kotest.matchers.shouldBe
 import io.mockk.*
 import io.mockk.impl.annotations.InjectMockKs
@@ -20,9 +22,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
-import java.math.BigDecimal
-import java.time.Clock
-import java.time.Instant
 import kotlin.random.Random
 
 @ExtendWith(MockKExtension::class)
@@ -38,60 +37,71 @@ internal class CloseDispenserCommandHandlerShould {
     lateinit var usageRepository: UsageRepositoryPort
     
     @MockK
-    lateinit var clock: Clock
-    
-    @MockK
     lateinit var spendingCalculator: SpendingCalculator
+    
+    @RelaxedMockK
+    lateinit var usageValidator: UsageValidator
     
     private val storedDispenser = DispenserMother.of()
     private val usageSlot = slot<Usage>()
-    private val expectedClosedAt = Instant.now()
+    private var givenCommand = CloseDispenserCommandMother.of(dispenserId = storedDispenser.id)
     
     @BeforeEach
     internal fun setUp() {
-        every { clock.instant() } returns expectedClosedAt
         every { dispenserRepository.findByIdRequired(any()) } returns storedDispenser
     }
     
     @AfterEach
     internal fun tearDown() {
-        verify(exactly = 1) { clock.instant() }
+        verify(exactly = 1) { dispenserRepository.findByIdRequired(givenCommand.dispenserId) }
     
         confirmVerified(
             dispenserRepository,
             usageRepository,
-            clock,
             spendingCalculator,
+            usageValidator,
         )
     }
     
     @Test
     fun `does nothing when dispenser not found`() {
         // given
-        val givenCommand = CloseDispenserCommandMother.of()
-        every { dispenserRepository.findByIdRequired(any()) } throws mockk()
-        
+        givenCommand = CloseDispenserCommandMother.of()
+        val expectedException = mockk<DispenserInUseException>()
+        every { dispenserRepository.findByIdRequired(any()) } throws expectedException
+    
         // when
-        assertThrows<DispenserInUseException> { handler.handle(givenCommand) }
-        
+        val exception = assertThrows<DispenserInUseException> { handler.handle(givenCommand) }
+    
         // then
-        verify(exactly = 1) { dispenserRepository.findByIdRequired(givenCommand.dispenserId) }
+        exception shouldBe expectedException
     }
     
     @Test
     fun `throw not opened exception when opened usage not found`() {
         // given
-        val givenCommand = CloseDispenserCommandMother.of(
-            dispenserId = storedDispenser.id,
-        )
         every { usageRepository.findOpened(any()) } returns null
-        
+    
         // when
         assertThrows<DispenserNotOpenedException> { handler.handle(givenCommand) }
+    
+        // then
+        verify(exactly = 1) { usageRepository.findOpened(givenCommand.dispenserId) }
+    }
+    
+    @Test
+    fun `throw validation exception when usage validator throws`() {
+        // given
+        val expectedException = mockk<ClosedAtInvalidException>()
+        every { usageValidator.validateClosedAt(any(), any()) } throws expectedException
+        
+        // when
+        val exception = assertThrows<ClosedAtInvalidException> { handler.handle(givenCommand) }
         
         // then
-        verify(exactly = 1) { dispenserRepository.findByIdRequired(givenCommand.dispenserId) }
+        exception shouldBe expectedException
         verify(exactly = 1) { usageRepository.findOpened(givenCommand.dispenserId) }
+        verify { usageValidator.validateClosedAt(capture(usageSlot), givenCommand.closedAt) }
     }
     
     @Test
@@ -113,20 +123,12 @@ internal class CloseDispenserCommandHandlerShould {
         handler.handle(givenCommand)
         
         // then
-        verify(exactly = 1) { dispenserRepository.findByIdRequired(givenCommand.dispenserId) }
         verify(exactly = 1) { usageRepository.findOpened(givenCommand.dispenserId) }
-        verify(exactly = 1) { spendingCalculator.calculate(storedUsage, expectedClosedAt) }
-        verifyUsageUpdated(storedUsage, expectedClosedAt, calculatedAmount)
-    }
-    
-    private fun verifyUsageUpdated(
-        storedUsage: Usage,
-        expectedClosedAt: Instant?,
-        calculatedAmount: BigDecimal,
-    ) {
+        verify { usageValidator.validateClosedAt(capture(usageSlot), givenCommand.closedAt) }
+        verify(exactly = 1) { spendingCalculator.calculate(storedUsage, givenCommand.closedAt) }
         verify(exactly = 1) { usageRepository.update(capture(usageSlot)) }
         usageSlot.captured shouldBe storedUsage.copy(
-            closedAt = expectedClosedAt,
+            closedAt = givenCommand.closedAt,
             totalSpent = calculatedAmount,
         )
     }

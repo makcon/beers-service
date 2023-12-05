@@ -4,10 +4,9 @@ import com.rviewer.beers.app.dto.GetSpendingResponseV1
 import com.rviewer.beers.app.mapper.toDto
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import org.springframework.test.web.servlet.ResultActions
+import org.springframework.http.HttpStatus
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import java.util.*
 
 internal class ATGetUsagesProcessShould : ATAbstractDispenserTest() {
@@ -24,7 +23,7 @@ internal class ATGetUsagesProcessShould : ATAbstractDispenserTest() {
         val actions = mvc.perform(buildGetRequest(storedDispenser.id))
         
         // then
-        val response = verifyAndGetResponse(actions)
+        val response = verifyAndGetObject(actions, HttpStatus.OK, GetSpendingResponseV1::class.java)
         response shouldBe GetSpendingResponseV1(
             totalCount = 2,
             totalAmount = listOf(storedUsage2, storedUsage).sumOf { it.totalSpent!! },
@@ -44,7 +43,7 @@ internal class ATGetUsagesProcessShould : ATAbstractDispenserTest() {
         val actions = mvc.perform(buildGetRequest(storedDispenser.id))
         
         // then
-        val response = verifyAndGetResponse(actions)
+        val response = verifyAndGetObject(actions, HttpStatus.OK, GetSpendingResponseV1::class.java)
         response shouldBe GetSpendingResponseV1(
             totalCount = 3,
             totalAmount = listOf(storedUsage, storedUsage3, storedUsage2).sumOf { it.totalSpent!! },
@@ -62,22 +61,12 @@ internal class ATGetUsagesProcessShould : ATAbstractDispenserTest() {
         val actions = mvc.perform(get("/v1/dispensers/${storedDispenser.id}/spending"))
         
         // then
-        val response = verifyAndGetResponse(actions)
+        val response = verifyAndGetObject(actions, HttpStatus.OK, GetSpendingResponseV1::class.java)
         response shouldBe GetSpendingResponseV1(
             totalCount = 1,
             totalAmount = storedUsage.totalSpent!!,
             usages = listOf(storedUsage)
         )
-    }
-    
-    private fun verifyAndGetResponse(actions: ResultActions): GetSpendingResponseV1? {
-        val content = actions
-            .andExpect(MockMvcResultMatchers.status().isOk)
-            .andReturn()
-            .response
-            .contentAsString
-        
-        return objectMapper.readValue(content, GetSpendingResponseV1::class.java)
     }
     
     private fun buildGetRequest(

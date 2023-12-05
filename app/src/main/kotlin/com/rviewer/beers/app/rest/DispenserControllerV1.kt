@@ -1,14 +1,9 @@
 package com.rviewer.beers.app.rest
 
-import com.rviewer.beers.app.dto.CreateDispenserRequestParamsV1
-import com.rviewer.beers.app.dto.DispenserV1
-import com.rviewer.beers.app.dto.GetSpendingRequestParamsV1
-import com.rviewer.beers.app.dto.GetSpendingResponseV1
+import com.rviewer.beers.app.dto.*
 import com.rviewer.beers.app.mapper.toCommand
 import com.rviewer.beers.app.mapper.toDto
 import com.rviewer.beers.app.mapper.toQuery
-import com.rviewer.beers.domain.command.CloseDispenserCommand
-import com.rviewer.beers.domain.command.OpenDispenserCommand
 import com.rviewer.beers.domain.command.handler.CloseDispenserCommandHandler
 import com.rviewer.beers.domain.command.handler.CreateDispenserCommandHandler
 import com.rviewer.beers.domain.command.handler.OpenDispenserCommandHandler
@@ -33,11 +28,13 @@ class DispenserControllerV1(
     
     @PutMapping("/{id}/open")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun open(@PathVariable id: UUID) = openHandler.handle(OpenDispenserCommand(id))
+    fun open(@PathVariable id: UUID, @RequestBody params: OpenDispenserRequestParamsV1) =
+        openHandler.handle(params.toCommand(id))
     
     @PutMapping("/{id}/close")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun close(@PathVariable id: UUID) = closeHandler.handle(CloseDispenserCommand(id))
+    fun close(@PathVariable id: UUID, @RequestBody params: CloseDispenserRequestParamsV1) =
+        closeHandler.handle(params.toCommand(id))
     
     @GetMapping("{id}/spending")
     fun getSpending(@PathVariable id: UUID, params: GetSpendingRequestParamsV1): GetSpendingResponseV1 =

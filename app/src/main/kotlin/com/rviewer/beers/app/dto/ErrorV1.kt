@@ -8,7 +8,9 @@ data class ErrorV1(
 
 object ErrorCode {
     
+    const val INTERNAL_ERROR = "InternalError"
     const val NOT_FOUND = "NotFound"
     const val ALREADY_OPENED = "AlreadyOpened"
     const val ALREADY_CLOSED = "AlreadyClosed"
+    const val CLOSED_AT_INVALID = "ClosedAtInvalid"
 }

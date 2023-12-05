@@ -2,6 +2,7 @@ package com.rviewer.beers.app.rest
 
 import com.rviewer.beers.app.dto.ErrorCode
 import com.rviewer.beers.app.dto.ErrorV1
+import com.rviewer.beers.domain.exception.ClosedAtInvalidException
 import com.rviewer.beers.domain.exception.DispenserInUseException
 import com.rviewer.beers.domain.exception.DispenserNotOpenedException
 import com.rviewer.beers.domain.exception.ModelNotFoundException
@@ -15,6 +16,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 class RestExceptionHandler {
     
     private val log = KotlinLogging.logger { }
+    
+    @ExceptionHandler(Exception::class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    fun handle(exception: Exception): ErrorV1 = createError(
+        code = ErrorCode.INTERNAL_ERROR,
+        exception = exception
+    )
     
     @ExceptionHandler(ModelNotFoundException::class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -34,6 +42,13 @@ class RestExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     fun handle(exception: DispenserNotOpenedException): ErrorV1 = createError(
         code = ErrorCode.ALREADY_CLOSED,
+        exception = exception
+    )
+    
+    @ExceptionHandler(ClosedAtInvalidException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handle(exception: ClosedAtInvalidException): ErrorV1 = createError(
+        code = ErrorCode.CLOSED_AT_INVALID,
         exception = exception
     )
     

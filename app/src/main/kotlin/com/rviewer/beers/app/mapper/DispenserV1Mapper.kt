@@ -2,7 +2,9 @@ package com.rviewer.beers.app.mapper
 
 import com.rviewer.beers.app.dto.*
 import com.rviewer.beers.app.utils.withPrecision
+import com.rviewer.beers.domain.command.CloseDispenserCommand
 import com.rviewer.beers.domain.command.CreateDispenserCommand
+import com.rviewer.beers.domain.command.OpenDispenserCommand
 import com.rviewer.beers.domain.model.Dispenser
 import com.rviewer.beers.domain.model.GetSpendingResult
 import com.rviewer.beers.domain.model.Page
@@ -38,4 +40,14 @@ fun Usage.toDto() = UsageV1(
     closedAt = closedAt,
     flowVolume = flowVolume,
     totalSpent = totalSpent?.withPrecision(),
+)
+
+fun OpenDispenserRequestParamsV1.toCommand(dispenserId: UUID) = OpenDispenserCommand(
+    dispenserId = dispenserId,
+    openedAt = openedAt,
+)
+
+fun CloseDispenserRequestParamsV1.toCommand(dispenserId: UUID) = CloseDispenserCommand(
+    dispenserId = dispenserId,
+    closedAt = closedAt,
 )
