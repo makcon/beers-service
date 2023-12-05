@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment
 import org.springframework.test.web.servlet.MockMvc
 import java.time.Instant
+import java.time.temporal.ChronoUnit.MILLIS
 import java.util.*
 
 @AutoConfigureMockMvc
@@ -48,7 +49,10 @@ abstract class ATAbstractDispenserTest {
         return dispenser
     }
     
-    fun createUsage(dispenserId: UUID, closedAt: Instant? = Instant.now()): Usage {
+    fun createUsage(
+        dispenserId: UUID,
+        closedAt: Instant? = Instant.now().truncatedTo(MILLIS),
+    ): Usage {
         val usage = UsageMother.of(
             dispenserId = dispenserId,
             closedAt = closedAt
