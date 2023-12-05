@@ -11,3 +11,7 @@ spring:
     password: ${POSTGRES_PASSWORD:rv_password}
     driverClassName: org.postgresql.Driver
     initialization-mode: always
+  jpa:
+    database: POSTGRESQL
+    hibernate:
+      ddl-auto: update
