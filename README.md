@@ -40,32 +40,3 @@ service.
 
 > ⚠️ The promoters could check how much money was spent on each dispenser while an attendee is taking beer!
 > So you have to control that by calculating the time diff between the tap opening and the request time
-
----
-
-## What are we looking for?
-
-* **A well-designed solution and architecture.** Avoid duplication, extract re-usable code
-  where makes sense. We want to see that you can create an easy-to-maintain codebase.
-* **Test as much as you can.** One of the main pain points of maintaining other's code
-  comes when it does not have tests. So try to create tests covering, at least, the main classes.
-* **Document your decisions**. Try to explain your decisions, as well as any other technical requirement (how to run the
-  API, external dependencies, etc ...)
-
-## How to submit your solution
-
-* Push your code to the `devel` branch - we encourage you to commit regularly to show your thinking process was.
-* **Create a new Pull Request** to `main` branch & **merge it**.
-
-Once merged you **won't be able to change or add** anything to your solution, so double-check that everything is as
-you expected!
-
-Remember that **there is no countdown**, so take your time and implement a solution that you are proud!
-
---- 
-
-<p align="center">
-  If you have any feedback or problem, <a href="mailto:help@rviewer.io">let us know!</a> 🤘
-  <br><br>
-  Made with ❤️ by <a href="https://rviewer.io">Rviewer</a>
-</p>
