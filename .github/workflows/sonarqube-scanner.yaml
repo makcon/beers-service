@@ -16,9 +16,6 @@ on:
 jobs:
   sonarqube:
     runs-on: self-hosted
-    needs:
-        - secrets-gate
-    if: ${{ needs.secrets-gate.outputs.ok == 'true' }}
     steps:
       - uses: actions/checkout@v3
       - name: Run testing suite
